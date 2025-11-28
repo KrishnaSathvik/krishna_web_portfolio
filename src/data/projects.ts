@@ -79,6 +79,7 @@ export const projects: Project[] = [
     category: 'Full-Stack Web App',
     status: 'live',
     tags: ['React', 'Vite', 'Supabase', 'html2canvas', 'Prism.js', 'DOMPurify'],
+    url: 'https://templio-pi.vercel.app/',
   },
   {
     id: 'astro-portfolio',

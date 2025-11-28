@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Moon, Sun, ArrowRight, Send, Github, Linkedin, Globe2, ArrowUpRight, Code2, FileCode, Cpu, Activity, FlaskConical, Clock, Code, Monitor } from 'lucide-react';
+import { Moon, Sun, ArrowRight, Send, Github, Linkedin, Globe2, ArrowUpRight, Code2, FileCode, Cpu, Activity, FlaskConical, Clock, Code, Monitor, Menu, X } from 'lucide-react';
 import { projects } from './data/projects';
 
 function App() {
   const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('system');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const applyTheme = (resolvedTheme: 'dark' | 'light') => {
     const root = document.documentElement;
@@ -53,6 +54,32 @@ function App() {
     }
   }, [theme]);
 
+  // Close mobile menu on outside click or window resize
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (mobileMenuOpen && !target.closest('header')) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    if (mobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [mobileMenuOpen]);
+
   const toggleTheme = () => {
     let newTheme: 'dark' | 'light' | 'system';
     if (theme === 'dark') {
@@ -90,11 +117,12 @@ function App() {
           </div>
 
           {/* Header */}
-          <header className="relative z-20 mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 pt-6 sm:px-6 lg:px-8">
+          <header className="relative z-20 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6 lg:px-8">
             <a
               href="#top"
               aria-label="Krishna home"
               className="group inline-flex items-center gap-2"
+              onClick={() => setMobileMenuOpen(false)}
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100/70 shadow-sm shadow-slate-900/10 ring-1 ring-slate-200/50 backdrop-blur transition-all group-hover:border-indigo-500/40 group-hover:bg-indigo-500/10 dark:border-slate-800 dark:bg-slate-900/70 dark:shadow-black/40 dark:ring-black/50 dark:group-hover:border-indigo-500/40 dark:group-hover:bg-indigo-500/10">
                 <Code className="h-4 w-4 text-slate-700 group-hover:text-indigo-600 transition-colors dark:text-slate-300 dark:group-hover:text-indigo-300" />
@@ -104,8 +132,9 @@ function App() {
               </span>
             </a>
 
+            {/* Desktop Navigation */}
             <nav
-              className="flex items-center gap-1 rounded-full border border-slate-200/80 bg-white/70 px-1.5 py-1 text-xs text-slate-700 shadow-sm shadow-slate-900/10 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/70 dark:text-slate-300 dark:shadow-black/40"
+              className="hidden items-center gap-1 rounded-full border border-slate-200/80 bg-white/70 px-1.5 py-1 text-xs text-slate-700 shadow-sm shadow-slate-900/10 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/70 dark:text-slate-300 dark:shadow-black/40 md:flex"
               aria-label="Primary"
             >
               <a
@@ -147,6 +176,76 @@ function App() {
                   <Monitor className="h-3.5 w-3.5" />
                 )}
               </button>
+            </nav>
+
+            {/* Mobile Navigation */}
+            <div className="flex items-center gap-2 md:hidden">
+              <button
+                onClick={toggleTheme}
+                type="button"
+                aria-label="Toggle theme"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/70 text-slate-700 shadow-sm shadow-slate-900/10 backdrop-blur hover:bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950/70 dark:text-slate-300 dark:shadow-black/40 dark:hover:bg-slate-800"
+              >
+                {theme === 'light' ? (
+                  <Sun className="h-4 w-4" />
+                ) : theme === 'dark' ? (
+                  <Moon className="h-4 w-4" />
+                ) : (
+                  <Monitor className="h-4 w-4" />
+                )}
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                type="button"
+                aria-label="Toggle menu"
+                aria-expanded={mobileMenuOpen}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/70 text-slate-700 shadow-sm shadow-slate-900/10 backdrop-blur hover:bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950/70 dark:text-slate-300 dark:shadow-black/40 dark:hover:bg-slate-800"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <Menu className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+
+            {/* Mobile Menu Dropdown */}
+            <nav
+              className={`absolute left-4 right-4 top-20 z-30 flex flex-col gap-1 rounded-2xl border border-slate-200/80 bg-white/95 p-2 text-sm text-slate-700 shadow-lg shadow-slate-900/20 backdrop-blur-xl transition-all duration-200 ease-out dark:border-slate-800/80 dark:bg-slate-950/95 dark:text-slate-300 dark:shadow-black/60 md:hidden ${
+                mobileMenuOpen
+                  ? 'opacity-100 translate-y-0 pointer-events-auto'
+                  : 'opacity-0 -translate-y-2 pointer-events-none'
+              }`}
+              aria-label="Mobile navigation"
+            >
+              <a
+                href="#work"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-xl px-4 py-3 font-medium tracking-tight text-slate-700 transition-colors hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-slate-50"
+              >
+                Work
+              </a>
+              <a
+                href="#tech-stack"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-xl px-4 py-3 font-medium tracking-tight text-slate-700 transition-colors hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-slate-50"
+              >
+                Technologies
+              </a>
+              <a
+                href="#about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-xl px-4 py-3 font-medium tracking-tight text-slate-700 transition-colors hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-slate-50"
+              >
+                About
+              </a>
+              <a
+                href="#contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-xl px-4 py-3 font-medium tracking-tight text-slate-700 transition-colors hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-slate-50"
+              >
+                Contact
+              </a>
             </nav>
           </header>
 
